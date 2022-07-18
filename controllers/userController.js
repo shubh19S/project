@@ -1,4 +1,6 @@
-const user = require("../models/user");
+const db = require("../models/index");
+
+const User = db.user
 
 const registerUser = async (req, res) => {
   try {
@@ -12,7 +14,7 @@ const registerUser = async (req, res) => {
       gender,
     } = req.body;
 
-    const newUser = await user.create({
+    const newUser = await User.create({
       userName,
       firstName,
       lastName,
