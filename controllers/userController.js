@@ -1,4 +1,3 @@
-
 const db = require("../models/index");
 
 const User = db.user
@@ -32,10 +31,10 @@ const registerUser = async (req, res) => {
       status: 200,
       data: newUser,
     });
-  } catch (errors) {
+  } catch (err) {
     // res.send("Error Occured", err);
-    console.log("error",errors)
-    res.status(400).send(errors.message) 
+    console.log("error",err)
+    res.status(400).send({error: err.errors[0].message}) 
   }
 };
 module.exports = {
