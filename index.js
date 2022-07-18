@@ -6,7 +6,10 @@ dotenv.config;
 
 const app = express();
 
+// Routes
+
 app.use("api/v1/user", userRoutes);
+
 
 db.sync()
   .then((result) => console.log("sync success"))
