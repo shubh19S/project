@@ -1,4 +1,3 @@
-const user = require("../models/user");
 
 const registerUser = async (req, res) => {
   try {
