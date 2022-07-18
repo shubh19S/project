@@ -9,6 +9,9 @@ const validate = require('./../validations/userValidation')
 router
   .route('/')
   .post(userController.registerUser)
-
+  // .get(userController.getUser)
+  // .delete(userController.deleteUser)
+  
+router.route('/login').post(userController.loginUser)
 
   module.exports = router
