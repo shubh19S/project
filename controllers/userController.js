@@ -16,6 +16,7 @@ const registerUser = async (req, res) => {
       gender,
     } = req.body;
 
+
     const newUser = await User.create({
       userName,
       firstName,
@@ -26,13 +27,15 @@ const registerUser = async (req, res) => {
       gender,
     });
 
-    res.status("200").json({
+    res.status(200).json({
       message: "created successfully",
       status: 200,
       data: newUser,
     });
-  } catch (err) {
-    res.send("Error Occured", err);
+  } catch (errors) {
+    // res.send("Error Occured", err);
+    console.log("error",errors)
+    res.status(400).send(errors.message) 
   }
 };
 module.exports = {

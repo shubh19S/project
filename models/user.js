@@ -16,10 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   User.init({
     userName: {
       type: DataTypes.STRING,
-      unique:{
-        args:true,
-        msg: 'User Name must be unique'
-      },
+      unique: {
+          msg: "Must be unique"
+        },
       allowNull: false
     },
     firstName: {
@@ -29,10 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
-      unique: {
-        args: true,
-        msg: "email address must be unique"
-      },
+      unique: true,
       validate: {
         isEmail: true
       },

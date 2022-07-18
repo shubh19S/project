@@ -10,10 +10,7 @@ module.exports = {
       },
       userName: {
         type: Sequelize.STRING,
-        unique:{
-          args:true,
-          msg: 'User Name must be unique'
-        },
+        unique: true,
         allowNull: false
       },
       firstName: {
@@ -23,10 +20,7 @@ module.exports = {
       lastName: Sequelize.STRING,
       email: {
         type: Sequelize.STRING,
-        unique: {
-          args: true,
-          msg: "email address must be unique"
-        },
+        unique: true,
         validate: {
           isEmail: true
         },
