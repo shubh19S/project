@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
-const validate = require('./../validations/userValidation')
+const auth = require('../middleware/auth')
+//const validate = require('./../validations/userValidation')
 
 
 
@@ -13,5 +14,12 @@ router
   // .delete(userController.deleteUser)
   
 router.route('/login').post(userController.loginUser)
+
+router.route('/all').get(auth,(req,res)=>{
+  res.json("Working")
+})
+
+
+
 
   module.exports = router
