@@ -14,7 +14,7 @@ const checkAuth =async()=>{
     console.log("auth success")
    
  } catch (err) {
-    console.log('Error occured ', error)
+    console.log('Error occured ', err)
     
  }
 }
