@@ -28,13 +28,8 @@ const registerUser = async (req, res) => {
       password:hashedPassword,
       gender,
     });
-    console.log("user",newUser)
-
-    console.log("user",newUser.id)
 
     const token = await tokenService.generateJWT(newUser.id)
-
-    console.log('token',token)
 
     res.status(200).json({
       message: "created successfully",

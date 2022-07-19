@@ -11,7 +11,6 @@ const  generateJWT = (userId) => {
     const payload = {
         sub : userId
     };
-    console.log("aa gya yaha tk",payload)
 
     return jwt.sign(payload, secret, { expiresIn: process.env.JWT_EXPIRATION})
     // return jwt.sign(payload, secret);
