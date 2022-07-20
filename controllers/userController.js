@@ -19,6 +19,7 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password,10)
 
+
     const newUser = await User.create({
       userName,
       firstName,
@@ -40,6 +41,8 @@ const registerUser = async (req, res) => {
   } catch (err) {
     res.status(400).json(err) 
   }
+
+
 };
 const loginUser = async (req, res) => {
   try {
@@ -51,9 +54,9 @@ const loginUser = async (req, res) => {
     
     if(user && (await bcrypt.compare(password,user.password))){
 
-      const token = await tokenService.generateJWT(userId)
+    const token = await tokenService.generateJWT(userId)
 
-      res.status(200).json({
+    res.status(200).json({
         message: "Login successfully",
         status: 200,
         data: user,
@@ -69,9 +72,7 @@ const loginUser = async (req, res) => {
 
   
   } catch (err) {
-
     res.status(400).json(err) 
-
   }
 };
 module.exports = {
