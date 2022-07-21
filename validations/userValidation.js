@@ -16,11 +16,9 @@ const Joi = require('joi')
 
 const test = {
   body: Joi.object().keys({
-
-     email:Joi.string().email().required(),
-   phone:Joi.string().required(),
+    email:Joi.string().email().required(),
+    phone:Joi.string().required(),
     birthday:Joi.date().max('1-1-2004').iso()
-
   }),
 };
 
