@@ -1,22 +1,22 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
-  
-    const authHeader = req.headers.authorization
+  const authHeader = req.headers.authorization;
 
-    if(!authHeader){
-        res.status(403).send({auth: false, message: "Please add token"})
-    }
+  if (!authHeader) {
+    res.status(403).send({ message: "Please add token" });
+  }
 
-    const token = authHeader.split(" ")[1]
+  const token = authHeader.split(" ")[1];
 
-    jwt.verify(token, process.env.SECRET_KEY, function (err, result) {
-        if (err)
-            return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+  jwt.verify(token, process.env.SECRET_KEY, function (err, result) {
+    if (err)
+      return res
+        .status(500)
+        .send({ auth: false, message: "Failed to authenticate token." });
 
-       
-        next(); 
-    });
-}
+    next();
+  });
+};
 
 module.exports = verifyToken;
