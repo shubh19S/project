@@ -1,49 +1,30 @@
-const express = require('express')
+const express = require("express");
 
-const router = express.Router()
-const userController = require('../controllers/userController')
-const auth = require('../middleware/auth')
-const userValidation = require('./../validations/userValidation')
+const router = express.Router();
+const userController = require("../controllers/userController");
+const auth = require("../middleware/auth");
+const userValidation = require("./../validations/userValidation");
 
-const validate = require("./../middleware/validate")
-
+const validate = require("./../middleware/validate");
 
 router
-  .route('/')
-  .post( userController.registerUser)
-  // .get(userController.getUser)
-  // .delete(userController.deleteUser)
-  
-router.route('/login').post(userController.loginUser)
+  .route("/")
+  .post(validate(userValidation.registerUser), userController.registerUser);
+//.get(userController.getUser)
+//.delete(userController.deleteUser)
 
-router.route('/all').get(auth,(req,res)=>{
-  res.json("Working")
-})
-// router.route('/test').post((req,res,next)=>{
-//   const Joi = require('joi')
-//   const data =req.body 
-//   const schema =Joi.object().keys({
-//     email:Joi.string().email().required(),
-//     phone:Joi.string().required(),
-//     birthday:Joi.date().max('1-1-2004').iso()
+router.route("/login").post(userController.loginUser);
+router
+  .route("/profile/:id")
+  .get(userController.getProfile)
+  .patch(userController.updateProfile)
+  .delete(userController.deleteProfile);
+router.route("/all").get(auth, (req, res) => {
+  res.json("Working");
+});
 
-//   })
-//   const Validation = schema.validate(req.body);
+router.route("/test").post(auth, validate(userValidation.test), (req, res) => {
+  res.json("Working");
+});
 
-//   if(Validation.error){
-//     res.json(Validation.error.details[0].message)
-//    }else{
-//     next()
-//    }
-  
-// },(req,res)=>{
-//   res.json('Working')
-// })
-
-router.route('/test').post(validate(userValidation.test.body),(req,res)=>{
-  res.json('Working')
-})
-
-
-
-  module.exports = router
+module.exports = router;
