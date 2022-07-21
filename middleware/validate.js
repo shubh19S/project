@@ -1,25 +1,18 @@
-const Joi = require('joi')
-
-
+const Joi = require("joi");
 
 // console.log(userValidation.registerUser)
-const validate = (valdateSchema) =>{
-    return (req,res,next)=>{
+const validate = (validateSchema) => {
+  const schema = validateSchema.body;
 
-      const { schema } = valdateSchema.body
-    
-        const Validation = schema.validate(req.body);
-      
-        if(Validation.error){
-          res.json(Validation.error.details[0].message)
-         }else{
-          next()
-         }
-        
-      }
-}
-  
+  return (req, res, next) => {
+    const Validation = schema.validate(req.body);
+
+    if (Validation.error) {
+      res.json(Validation.error.details[0].message);
+    } else {
+      next();
+    }
+  };
+};
 
 module.exports = validate;
-  
-  
