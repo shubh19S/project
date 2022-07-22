@@ -13,7 +13,6 @@ const  generateJWT = async(userId) => {
     };
 
     return await jwtSignAsync(payload, secret, { expiresIn: process.env.JWT_EXPIRATION})
-    // return jwt.sign(payload, secret);
 };
 
 const verifyToken = async(token) => {

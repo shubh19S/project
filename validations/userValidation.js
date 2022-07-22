@@ -13,14 +13,24 @@ const registerUser = {
     gender: Joi.string().valid('Male', 'Female', 'Others').required()
   }),
 };
+const updateUser = {
+  body: Joi.object().keys({
+
+ 
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+
+
+    phoneNumber: Joi.string(),
+    gender: Joi.string().valid('Male', 'Female', 'Others')
+  }),
+};
 
 const test = {
   body: Joi.object().keys({
-
-     email:Joi.string().email().required(),
-   phone:Joi.string().required(),
+    email:Joi.string().email().required(),
+    phone:Joi.string().required(),
     birthday:Joi.date().max('1-1-2004').iso()
-
   }),
 };
 
@@ -29,5 +39,6 @@ const test = {
 
 module.exports = {
     registerUser,
+    updateUser,
     test
 }

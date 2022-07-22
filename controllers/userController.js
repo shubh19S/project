@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
       password,
       gender,
     } = req.body;
-  
+
     const hashedPassword = await hashUtil.generateHash(password, 10);
 
     const newUser = await User.create({
@@ -71,12 +71,23 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const id = req.params.id;
+
+    if(id!=req.user.id){
+      res.status(401).json({
+        message: "Error",
+        status: 401,
+        data: "Unauthorized",
+      }); 
+    }
+  if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
     res.status(200).json({
       message: "Success",
       status: 200,
       data: user,
     });
+  }
+ 
   } catch (err) {
     res.status(400).json(err);
   }
@@ -84,6 +95,15 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const { id } = req.params;
+
+  if(id!=req.user.id){
+    res.status(401).json({
+      message: "Error",
+      status: 401,
+      data: "Unauthorized",
+    }); 
+  }
+  if(id==req.user.id){
   const user = await User.findOne({ where: { id } });
 
   if (!user) {
@@ -115,13 +135,25 @@ const updateProfile = async (req, res) => {
       status: 200,
       data: result,
     });
+    }
   }
 };
 
 const deleteProfile = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if(id!=req.user.id){
+      res.status(401).json({
+        message: "Error",
+        status: 401,
+        data: "Unauthorized",
+      }); 
+    }
+    if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
+    
+
 
     if (!user) {
       const result = "User not found";
@@ -139,9 +171,11 @@ const deleteProfile = async (req, res) => {
         data: result,
       });
     }
+  }
   } catch (err) {
     res.status(400).json(err);
   }
+  
 };
 module.exports = {
   registerUser,
