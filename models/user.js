@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     userName: {
       type: DataTypes.STRING,
       unique: {
-          msg: "Must be unique"
+          msg: "Username Must be unique"
         },
       allowNull: false
     },
@@ -28,7 +28,9 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
-      unique: true,
+      unique: {
+        msg: "Email Must be unique"
+      },
       validate: {
         isEmail: true
       },
@@ -37,8 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: {
       type: DataTypes.STRING,
       unique: {
-        args: true,
-        msg: "Phone Number must be unique"
+        msg: "Phone Number Must be unique"
       },
       allowNull: false
     },

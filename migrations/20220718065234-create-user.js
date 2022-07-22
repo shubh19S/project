@@ -10,7 +10,9 @@ module.exports = {
       },
       userName: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: {
+          msg: "Username Must be unique"
+        },
         allowNull: false
       },
       firstName: {
@@ -20,7 +22,9 @@ module.exports = {
       lastName: Sequelize.STRING,
       email: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: {
+          msg: "Email Must be unique"
+        },
         validate: {
           isEmail: true
         },
@@ -29,8 +33,7 @@ module.exports = {
       phoneNumber: {
         type: Sequelize.STRING,
         unique: {
-          args: true,
-          msg: "Phone Number must be unique"
+          msg: "Phone Number Must be unique"
         },
         allowNull: false
       },
@@ -46,7 +49,8 @@ module.exports = {
       },
       isActive: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

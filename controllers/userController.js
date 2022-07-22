@@ -31,7 +31,7 @@ const registerUser = async (req, res) => {
     const token = await tokenService.generateJWT(newUser.id);
 
     const sanitizeUser = {...newUser.dataValues}
-    delete sanitizeUser
+    delete sanitizeUser.password
 
     res.status(200).json({
       message: "created successfully",
