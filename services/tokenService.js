@@ -4,7 +4,9 @@ const dotenv = require("dotenv");
 dotenv.config;
 
 
-const  generateJWT = (userId) => {
+const  generateJWT = async(userId) => {
+
+ 
 
     const secret = process.env.SECRET_KEY;
 
@@ -13,7 +15,7 @@ const  generateJWT = (userId) => {
     };
 
     return jwt.sign(payload, secret, { expiresIn: process.env.JWT_EXPIRATION})
-    // return jwt.sign(payload, secret);
+  
 };
 
 const verifyToken = async(token) => {
