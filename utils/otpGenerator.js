@@ -7,4 +7,4 @@ return otp
 console.log(generateOtp());
 module.exports = {
     generateOtp
-}
+}            
