@@ -16,9 +16,9 @@ router
 router.route("/login").post(userController.loginUser);
 router
   .route("/profile/:id")
-  .get(userController.getProfile)
-  .patch(userController.updateProfile)
-  .delete(userController.deleteProfile);
+  .get(auth,userController.getProfile)
+  .patch(auth,validate(userValidation.updateUser) ,userController.updateProfile)
+  .delete(auth,userController.deleteProfile);
 router.route("/all").get(auth, (req, res) => {
   res.json("Working");
 });

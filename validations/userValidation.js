@@ -13,6 +13,18 @@ const registerUser = {
     gender: Joi.string().valid('Male', 'Female', 'Others').required()
   }),
 };
+const updateUser = {
+  body: Joi.object().keys({
+
+ 
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+
+
+    phoneNumber: Joi.string(),
+    gender: Joi.string().valid('Male', 'Female', 'Others')
+  }),
+};
 
 const test = {
   body: Joi.object().keys({
@@ -29,5 +41,6 @@ const test = {
 
 module.exports = {
     registerUser,
+    updateUser,
     test
 }
