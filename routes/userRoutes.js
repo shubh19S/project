@@ -14,17 +14,16 @@ router
 //.delete(userController.deleteUser)
 
 router.route("/login").post(userController.loginUser);
+
+
+router.route("/forgotPassword").post(userController.forgotPassword);
+
 router
   .route("/profile/:id")
   .get(auth,userController.getProfile)
   .patch(auth,validate(userValidation.updateUser) ,userController.updateProfile)
   .delete(auth,userController.deleteProfile);
-router.route("/all").get(auth, (req, res) => {
-  res.json("Working");
-});
 
-router.route("/test").post(auth, validate(userValidation.test), (req, res) => {
-  res.json("Working");
-});
+ 
 
 module.exports = router;

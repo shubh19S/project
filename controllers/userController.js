@@ -180,10 +180,38 @@ const deleteProfile = async (req, res) => {
   }
   
 };
+
+const forgotPassword = async(req,res) => {
+  const { email } = req.body
+  const user = await User.findOne({where: {
+    email
+  }})
+  if (!user) {
+    res.status(404).json({
+      message: "User not found with this email",
+      status: 404,
+      data: null,
+    });
+  }
+  
+  const resetPasswordToken = await tokenService.generateJWT(user.id);
+  
+  // send response with token
+
+  res.status(200).json({
+    message: "Success",
+    status: 200,
+    data: resetPasswordToken,
+  });
+  
+}
+
+
 module.exports = {
   registerUser,
   loginUser,
   getProfile,
   updateProfile,
   deleteProfile,
+  forgotPassword
 };
