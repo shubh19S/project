@@ -24,6 +24,9 @@ router
   .patch(auth,validate(userValidation.updateUser) ,userController.updateProfile)
   .delete(auth,userController.deleteProfile);
 
- 
+router
+     .route('/change-password')  
+     .patch(auth,validate(userValidation.changePassword),userController.changePassword)
+
 
 module.exports = router;
