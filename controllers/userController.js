@@ -1,6 +1,7 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
+const {hashUtil} = require('../utils') 
 
 const User = db.user;
 
@@ -15,8 +16,8 @@ const registerUser = async (req, res) => {
       password,
       gender,
     } = req.body;
-    // const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const hashedPassword = await hashUtil.generateHash(password, 10);
 
     const newUser = await User.create({
       userName,
@@ -45,10 +46,8 @@ const loginUser = async (req, res) => {
     const { userName, password } = req.body;
 
     const user = await User.findOne({ where: { userName } });
-    console.log(user);
-    console.log("value", await bcrypt.compare(password, user.password));
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && (await hashUtil.compareHash(password, user.password))) {
       const token = await tokenService.generateJWT(user.Id);
 
       res.status(200).json({
