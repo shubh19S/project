@@ -6,14 +6,16 @@ dotenv.config;
 
 const  generateJWT = async(userId) => {
 
+ 
+
     const secret = process.env.SECRET_KEY;
 
     const payload = {
         sub : userId
     };
 
-    return  await jwtSignAsync(payload, secret, { expiresIn: process.env.JWT_EXPIRATION})
-    // return jwt.sign(payload, secret);
+    return jwt.sign(payload, secret, { expiresIn: process.env.JWT_EXPIRATION})
+  
 };
 
 const verifyToken = async(token) => {

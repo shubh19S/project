@@ -15,8 +15,8 @@ const registerUser = async (req, res) => {
       password,
       gender,
     } = req.body;
-    // const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
       userName,
@@ -48,11 +48,12 @@ const loginUser = async (req, res) => {
     const { userName, password } = req.body;
 
     const user = await User.findOne({ where: { userName } });
-    console.log(user);
-    console.log("value", await bcrypt.compare(password, user.password));
+    
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = await tokenService.generateJWT(user.Id);
+
+
+      const token = await tokenService.generateJWT(user.id);
 
       res.status(200).json({
         message: "Login successfully",
@@ -75,12 +76,23 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const id = req.params.id;
+
+    if(id!=req.user.id){
+      res.status(401).json({
+        message: "Error",
+        status: 401,
+        data: "Unauthorized",
+      }); 
+    }
+  if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
     res.status(200).json({
       message: "Success",
       status: 200,
       data: user,
     });
+  }
+ 
   } catch (err) {
     res.status(400).json(err);
   }
@@ -88,6 +100,15 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const { id } = req.params;
+
+  if(id!=req.user.id){
+    res.status(401).json({
+      message: "Error",
+      status: 401,
+      data: "Unauthorized",
+    }); 
+  }
+  if(id==req.user.id){
   const user = await User.findOne({ where: { id } });
 
   if (!user) {
@@ -119,13 +140,25 @@ const updateProfile = async (req, res) => {
       status: 200,
       data: result,
     });
+    }
   }
 };
 
 const deleteProfile = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if(id!=req.user.id){
+      res.status(401).json({
+        message: "Error",
+        status: 401,
+        data: "Unauthorized",
+      }); 
+    }
+    if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
+    
+
 
     if (!user) {
       const result = "User not found";
@@ -143,9 +176,11 @@ const deleteProfile = async (req, res) => {
         data: result,
       });
     }
+  }
   } catch (err) {
     res.status(400).json(err);
   }
+  
 };
 module.exports = {
   registerUser,
