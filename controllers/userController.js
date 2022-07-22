@@ -1,7 +1,7 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil} = require('../utils') 
+const {hashUtil,otpGenerator,addMinutes} = require('../utils') 
 
 const User = db.user;
 
