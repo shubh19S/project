@@ -26,6 +26,14 @@ const updateUser = {
   }),
 };
 
+
+const changePassword = {
+   body : Joi.object().keys({
+    currentPassword : Joi.string().required(),
+    password : Joi.string().required()
+   })
+
+}
 const test = {
   body: Joi.object().keys({
     email:Joi.string().email().required(),
@@ -40,5 +48,6 @@ const test = {
 module.exports = {
     registerUser,
     updateUser,
+    changePassword,
     test
 }

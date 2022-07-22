@@ -31,13 +31,10 @@ const registerUser = async (req, res) => {
 
     const token = await tokenService.generateJWT(newUser.id);
 
-    const sanitizeUser = {...newUser.dataValues}
-    delete sanitizeUser.password
-
     res.status(200).json({
       message: "created successfully",
       status: 200,
-      data: sanitizeUser,
+      data: newUser,
       token,
     });
   } catch (err) {
@@ -51,7 +48,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ where: { userName } });
 
     if (user && (await hashUtil.compareHash(password, user.password))) {
-      const token = await tokenService.generateJWT(user.Id);
+      const token = await tokenService.generateJWT(user.id);
 
       res.status(200).json({
         message: "Login successfully",
@@ -180,10 +177,44 @@ const deleteProfile = async (req, res) => {
   }
   
 };
+
+const changePassword = async (req,res)=>{
+
+const { id : userId } = req.user
+
+const {currentPassword , password } = req.body
+
+const user = await User.findByPk(userId)
+
+if(!await hashUtil.compareHash(currentPassword,user.password)){
+
+return res.status(400).json({
+    statusCode : res.statusCode,
+    message : 'Old password does not matched',
+  })
+}
+
+const hashedPassword = await hashUtil.generateHash(password)
+const updatedUser =  await user.update( { password : hashedPassword })
+
+if(!updatedUser){
+  return res.status(400).json({
+    statusCode : res.statusCode,
+    message : 'Provide valid details',
+  })
+}
+
+return res.status(200).json({
+  statusCode : res.statusCode,
+  message : 'Password changed',
+})
+}
+
 module.exports = {
   registerUser,
   loginUser,
   getProfile,
   updateProfile,
   deleteProfile,
+  changePassword,
 };
