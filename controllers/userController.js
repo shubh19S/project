@@ -1,8 +1,8 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil,otpGenerator,addMinutes} = require('../utils'); 
-const nodemailer = require('nodemailer')
+const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils'); 
+
 
 const User = db.user;
 const Otp = db.otp
@@ -33,13 +33,10 @@ const registerUser = async (req, res) => {
 
     const token = await tokenService.generateJWT(newUser.id);
 
-    const sanitizeUser = {...newUser.dataValues}
-    delete sanitizeUser.password
-
     res.status(200).json({
       message: "created successfully",
       status: 200,
-      data: sanitizeUser,
+      data: newUser,
       token,
     });
   } catch (err) {
@@ -53,7 +50,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ where: { userName } });
 
     if (user && (await hashUtil.compareHash(password, user.password))) {
-      const token = await tokenService.generateJWT(user.Id);
+      const token = await tokenService.generateJWT(user.id);
 
       res.status(200).json({
         message: "Login successfully",
@@ -183,8 +180,19 @@ const deleteProfile = async (req, res) => {
   
 };
 const generateOtp = async (req,res)=>{
-  const {email } = req.body 
+  try {
+    const {email } = req.body 
+  if(!email){
+    res.status(404).json({
+      message: "Please enter a valid Email Id",
+      status: 404,
+      data: null,
+    });
+  }
+  if(email){
   const user = await User.findOne({ where: { email } });
+
+  
   if(!user ){
     res.status(404).json({
       message: "Please enter a valid Email Id",
@@ -193,36 +201,72 @@ const generateOtp = async (req,res)=>{
     });
   }
   if(user){
-    console.log(user.id)
+  
     const otp = otpGenerator.generateOtp()
     const expireAt= addMinutes.currentDate(10)
-    const newOtp = await Otp.create({
+    const newOtp = await Otp.upsert({id : user?.id,
       userId:user.id,
       otp,
       expireAt
 
     });
-    res.json(newOtp)
 
-    // const transporter = nodemailer.createTransport({
-    //   host:'gmail',
-    //   port:465,
-    //   secure:true,
-    // })
+  const mail = await sendEmail.sendMail(email,otp)
 
-
+  res.status(200).json({
+    message: "Success",
+    status: 200,
+    data: mail.messageId,
+  });
+    }
   }
-
-
-}
-const resetPassword =async (req,res)=>{
+  } catch (err) {
+    res.status(400).json(err);
+  }
   
+
 }
+
+
+const changePassword = async (req,res)=>{
+
+const { id : userId } = req.user
+
+const {currentPassword , password } = req.body
+
+const user = await User.findByPk(userId)
+
+if(!await hashUtil.compareHash(currentPassword,user.password)){
+
+return res.status(400).json({
+    statusCode : res.statusCode,
+    message : 'Old password does not matched',
+  })
+}
+
+const hashedPassword = await hashUtil.generateHash(password)
+const updatedUser =  await user.update( { password : hashedPassword })
+
+if(!updatedUser){
+  return res.status(400).json({
+    statusCode : res.statusCode,
+    message : 'Provide valid details',
+  })
+}
+
+return res.status(200).json({
+  statusCode : res.statusCode,
+  message : 'Password changed',
+})
+}
+
 module.exports = {
   registerUser,
   loginUser,
   getProfile,
   updateProfile,
   deleteProfile,
-  generateOtp
+  generateOtp,
+  changePassword
+
 };

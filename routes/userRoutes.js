@@ -22,6 +22,11 @@ router
   .delete(auth,userController.deleteProfile);
 
 router.route('/email/otp').post(userController.generateOtp)
+router
+     .route('/change-password')  
+     .patch(auth,validate(userValidation.changePassword),userController.changePassword)
+
+
 router.route("/all").get(auth, (req, res) => {
   res.json("Working");
 });
