@@ -36,4 +36,8 @@ db.Sequelize = Sequelize;
 
 db.user = require('./user')(sequelize,Sequelize)
 db.otp = require('./otp')(sequelize,Sequelize)
+
+db.user.hasOne(db.otp, {foreignKey : "userId", as : "otp"})
+db.otp.belongsTo(db.user, {foreignKey : "userId", as : "user"})
+
 module.exports = db;
