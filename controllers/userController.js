@@ -1,9 +1,11 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil,otpGenerator,addMinutes} = require('../utils') 
+const {hashUtil,otpGenerator,addMinutes} = require('../utils'); 
+const nodemailer = require('nodemailer')
 
 const User = db.user;
+const Otp = db.otp
 
 const registerUser = async (req, res) => {
   try {
@@ -180,10 +182,47 @@ const deleteProfile = async (req, res) => {
   }
   
 };
+const generateOtp = async (req,res)=>{
+  const {email } = req.body 
+  const user = await User.findOne({ where: { email } });
+  if(!user ){
+    res.status(404).json({
+      message: "Please enter a valid Email Id",
+      status: 404,
+      data: null,
+    });
+  }
+  if(user){
+    console.log(user.id)
+    const otp = otpGenerator.generateOtp()
+    const expireAt= addMinutes.currentDate(10)
+    const newOtp = await Otp.create({
+      userId:user.id,
+      otp,
+      expireAt
+
+    });
+    res.json(newOtp)
+
+    // const transporter = nodemailer.createTransport({
+    //   host:'gmail',
+    //   port:465,
+    //   secure:true,
+    // })
+
+
+  }
+
+
+}
+const resetPassword =async (req,res)=>{
+  
+}
 module.exports = {
   registerUser,
   loginUser,
   getProfile,
   updateProfile,
   deleteProfile,
+  generateOtp
 };

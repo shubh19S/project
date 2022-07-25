@@ -35,5 +35,5 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 db.user = require('./user')(sequelize,Sequelize)
-
+db.otp = require('./otp')(sequelize,Sequelize)
 module.exports = db;

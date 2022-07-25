@@ -6,6 +6,7 @@ const auth = require("../middleware/auth");
 const userValidation = require("./../validations/userValidation");
 
 const validate = require("./../middleware/validate");
+const user = require("../models/user");
 
 router
   .route("/")
@@ -19,6 +20,8 @@ router
   .get(auth,userController.getProfile)
   .patch(auth,validate(userValidation.updateUser) ,userController.updateProfile)
   .delete(auth,userController.deleteProfile);
+
+router.route('/email/otp').post(userController.generateOtp)
 router.route("/all").get(auth, (req, res) => {
   res.json("Working");
 });

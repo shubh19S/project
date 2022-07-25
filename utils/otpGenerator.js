@@ -4,7 +4,7 @@ const otp =  otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars:
 
 return otp
 }
-console.log(generateOtp());
+
 module.exports = {
     generateOtp
 }            
