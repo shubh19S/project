@@ -1,5 +1,4 @@
 const express = require("express");
-
 const router = express.Router();
 const userController = require("../controllers/userController");
 const auth = require("../middleware/auth");
@@ -11,12 +10,10 @@ router
   .route("/")
   .post(validate(userValidation.registerUser), userController.registerUser);
 //.get(userController.getUser)
-//.delete(userController.deleteUser)
 
-router.route("/login").post(userController.loginUser);
-
-
-router.route("/forgotPassword").post(userController.forgotPassword);
+router.route("/login").post(validate(userValidation.login),userController.loginUser);
+router.route("/forgotPassword").post(validate(userValidation.forgotPassword),userController.forgotPassword);
+router.route("/resetPassword").post(validate(userValidation.resetPassword),userController.resetPassword);
 
 router
   .route("/profile/:id")

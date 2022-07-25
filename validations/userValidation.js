@@ -3,10 +3,9 @@ const Joi = require('joi')
 
 const registerUser = {
   body: Joi.object().keys({
-
     userName: Joi.string().required(),
     firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    lastName: Joi.string(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     phoneNumber: Joi.string().required(),
@@ -15,39 +14,47 @@ const registerUser = {
 };
 const updateUser = {
   body: Joi.object().keys({
-
- 
     firstName: Joi.string(),
     lastName: Joi.string(),
-
-
     phoneNumber: Joi.string(),
     gender: Joi.string().valid('Male', 'Female', 'Others')
   }),
 };
 
-
 const changePassword = {
-   body : Joi.object().keys({
-    currentPassword : Joi.string().required(),
-    password : Joi.string().required()
-   })
-
+  body : Joi.object().keys({
+  currentPassword : Joi.string().required(),
+  password : Joi.string().required()
+  })
 }
-const test = {
-  body: Joi.object().keys({
-    email:Joi.string().email().required(),
-    phone:Joi.string().required(),
-    birthday:Joi.date().max('1-1-2004').iso()
-  }),
-};
 
+const login = {
+  body : Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    })
+}
 
+const forgotPassword = {
+  body : Joi.object().keys({
+    email: Joi.string().required().email(),
+    })
+}
+
+const resetPassword = {
+  body : Joi.object().keys({
+    email: Joi.string().required().email(),
+    otp: Joi.string().required(),
+    newPassword: Joi.string().required()
+    })
+}
 
 
 module.exports = {
     registerUser,
     updateUser,
     changePassword,
-    test
+    login,
+    forgotPassword,
+    resetPassword
 }

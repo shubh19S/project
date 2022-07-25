@@ -1,9 +1,10 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil,otpGenerator,addMinutes} = require('../utils') 
+const { hashUtil, otpGenerator, addMinutes } = require('../utils') 
 
 const User = db.user;
+const OTP = db.otp;
 
 const registerUser = async (req, res) => {
   try {
@@ -179,10 +180,12 @@ const deleteProfile = async (req, res) => {
 };
 
 const forgotPassword = async(req,res) => {
-  const { email } = req.body
+  try {
+    const { email } = req.body
   const user = await User.findOne({where: {
     email
   }})
+
   if (!user) {
     res.status(404).json({
       message: "User not found with this email",
@@ -190,50 +193,122 @@ const forgotPassword = async(req,res) => {
       data: null,
     });
   }
-  
-  const resetPasswordToken = await tokenService.generateJWT(user.id);
-  
-  // send response with token
 
+  const userId = user.id
+  const otp =  otpGenerator.generateOtp()
+  const expireTime = addMinutes.currentDate(10)
+
+  const previousOTP = await OTP.findOne( { userId : userId })
+  const userOTP = await OTP.upsert({ id : previousOTP?.id,userId, otp, expireAt: expireTime })
+
+  // send response with OTP
   res.status(200).json({
     message: "Success",
     status: 200,
-    data: resetPasswordToken,
+    data: userOTP,
   });
-  
+  } catch (error) {
+    res.status(400).json({
+      message: "error",
+      status: 400,
+      data: error.message,
+    })
+  }
+}
+
+
+
+const resetPassword = async (req, res) => {
+  try {
+    const { otp, newPassword , email } = req.body
+
+  const user = await User.findOne({
+      where : { email } ,
+      include: [{ model: OTP, as: "otp" }] 
+  })
+
+  if (!user) {
+   return res.status(404).json({ 
+    message: `User not found with this email `,
+    statusCode : this.statusCode
+   })
+  }
+
+  if(!user.otp || !user.otp.otp){
+    return res.status(404).json({ 
+      message: 'Resend OTP',
+      statusCode : res.statusCode
+    })
+  }
+
+ if( user.otp.expireAt.getTime() < new Date().getTime()){
+  return res.status(404).json({ 
+    message: `Otp has been expired please resend OTP`,
+    statusCode : this.statusCode
+   })
+ }
+
+ if(otp !== user.otp.otp){
+  return res.status(404).json({ 
+    message: 'Invalid',
+    statusCode : this.statusCode
+   })
+
+ }
+
+  //update password
+  const hashedPassword = await hashUtil.generateHash(newPassword)
+  const updatedUser =  await User.update(
+    {password: hashedPassword},
+    {where: { id : user.id }}
+  )
+
+  res.status(200).json({
+    message: "Password updated successfully",
+    status: 200,
+    data: updatedUser,
+  })
+  } catch (error) {
+    res.status(400).json({
+      message: "error",
+      status: 400,
+      data: error.message,
+    })
+  }
 }
 
 const changePassword = async (req,res)=>{
 
-const { id : userId } = req.user
+  const { id : userId } = req.user
 
-const {currentPassword , password } = req.body
+  const {currentPassword , password } = req.body
 
-const user = await User.findByPk(userId)
+  const user = await User.findByPk(userId)
 
-if(!await hashUtil.compareHash(currentPassword,user.password)){
+  if(!await hashUtil.compareHash(currentPassword,user.password)){
 
-return res.status(400).json({
-    statusCode : res.statusCode,
-    message : 'Old password does not matched',
-  })
-}
-
-const hashedPassword = await hashUtil.generateHash(password)
-const updatedUser =  await user.update( { password : hashedPassword })
-
-if(!updatedUser){
   return res.status(400).json({
-    statusCode : res.statusCode,
-    message : 'Provide valid details',
+      statusCode : res.statusCode,
+      message : 'Old password does not matched',
+    })
+  }
+
+  const hashedPassword = await hashUtil.generateHash(password)
+  const updatedUser =  await user.update( { password : hashedPassword })
+
+  if(!updatedUser){
+    return res.status(400).json({
+      statusCode : res.statusCode,
+      message : 'Provide valid details',
+    })
+  }
+
+  return res.status(200).json({
+      statusCode : res.statusCode,
+      message : 'Password changed',
   })
 }
 
-return res.status(200).json({
-  statusCode : res.statusCode,
-  message : 'Password changed',
-})
-}
 
 module.exports = {
   registerUser,
@@ -242,5 +317,6 @@ module.exports = {
   updateProfile,
   deleteProfile,
   forgotPassword,
-  changePassword
+  changePassword,
+  resetPassword
 };

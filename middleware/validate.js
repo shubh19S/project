@@ -8,7 +8,12 @@ const validate = (validateSchema) => {
     const Validation = schema.validate(req.body);
 
     if (Validation.error) {
-      res.json(Validation.error.details[0].message);
+      // res.json(Validation.error.details[0].message);
+      res.status(400).json({
+        message: "error",
+        status: 400,
+        data: Validation.error.details[0].message
+      })
     } else {
       next();
     }
