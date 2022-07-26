@@ -1,9 +1,10 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil} = require('../utils') 
+const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils'); 
 
 const User = db.user;
+const OTP = db.otp;
 
 const registerUser = async (req, res) => {
   try {
@@ -177,46 +178,161 @@ const deleteProfile = async (req, res) => {
   }
   
 };
+// const generateOtp = async (req,res)=>{
+//   try {
+//     const {email } = req.body 
+//   if(!email){
+//     res.status(404).json({
+//       message: "Please enter a valid Email Id",
+//       status: 404,
+//       data: null,
+//     });
+//   }
+//   if(email){
+//   const user = await User.findOne({ where: { email } });
 
-const changePassword = async (req,res)=>{
+
+
+
+
+const forgotPassword = async(req,res) => {
+  try {
+    const { email } = req.body
+  const user = await User.findOne({where: {
+    email
+  }})
+
+  if (!user) {
+    res.status(404).json({
+      message: "User not found with this email",
+      status: 404,
+      data: null,
+    });
+  }
+
+  const userId = user.id
+  const otp =  otpGenerator.generateOtp()
+  const expireTime = addMinutes.currentDate(10)
+
+  const previousOTP = await OTP.findOne( { userId : userId })
+  const userOTP = await OTP.upsert({ id : previousOTP?.id,userId, otp, expireAt: expireTime })
+
+  // send response with OTP
+  res.status(200).json({
+    message: "Success",
+    status: 200,
+    data: userOTP,
+  });
+  } catch (error) {
+    res.status(400).json({
+      message: "error",
+      status: 400,
+      data: error.message,
+    })
+  }
+}
+
+
+
+const resetPassword = async (req, res) => {
+  try {
+    
+  const { otp, newPassword , email } = req.body
+
+  const user = await User.findOne({
+      where : { email } ,
+      include: [{ model: OTP, as: "otp" }] 
+  })
+
+  if (!user) {
+   return res.status(404).json({ 
+    message: `User not found with this email `,
+    statusCode : this.statusCode
+   })
+  }
+
+  if(!user.otp || !user.otp.otp){
+    return res.status(404).json({ 
+      message: 'Resend OTP',
+      statusCode : res.statusCode
+    })
+  }
+
+ if( user.otp.expireAt.getTime() < new Date().getTime()){
+  return res.status(404).json({ 
+    message: `Otp has been expired please resend OTP`,
+    statusCode : this.statusCode
+   })
+ }
+
+ if(otp !== user.otp.otp){
+  return res.status(404).json({ 
+    message: 'Invalid',
+    statusCode : this.statusCode
+   })
+
+ }
+
+  //update password
+  const hashedPassword = await hashUtil.generateHash(newPassword)
+  const updatedUser =  await User.update(
+    {password: hashedPassword},
+    {where: { id : user.id }}
+  )
+
+  res.status(200).json({
+    message: "Password updated successfully",
+    status: 200,
+    data: updatedUser,
+  })
+  } catch (error) {
+    res.status(400).json({
+      message: "error",
+      status: 400,
+      data: error.message,
+    })
+  }
+}
+
+const changePassword = async (req,res) => {
 try{
-
-const { id : userId } = req.user
-
-const {currentPassword , password } = req.body
-
-const user = await User.findByPk(userId)
-
-if(!await hashUtil.compareHash(currentPassword,user.password)){
-
-return res.status(400).json({
-    message : 'Old password does not matched',
+  
+  const { id : userId } = req.user
+  
+  const {currentPassword , password } = req.body
+  
+  const user = await User.findByPk(userId)
+  
+  if(!await hashUtil.compareHash(currentPassword,user.password)){
+    return res.status(400).json({
+      message : 'Old password does not matched',
+      statusCode : res.statusCode,
+    })
+  }
+  
+  const hashedPassword = await hashUtil.generateHash(password)
+  const updatedUser =  await user.update( { password : hashedPassword })
+  
+  if(!updatedUser){
+    return res.status(400).json({
+      message : 'Provide valid details',
+      statusCode : res.statusCode,
+    })
+  }
+  
+  return res.status(200).json({
+    message : 'Password changed',
     statusCode : res.statusCode,
   })
+  
+  }catch(err){
+    return res.status(500).json({
+      message : 'Something went wrong',
+      statusCode : res.statusCode
+    })
+  }
 }
 
-const hashedPassword = await hashUtil.generateHash(password)
-const updatedUser =  await user.update( { password : hashedPassword })
-
-if(!updatedUser){
-  return res.status(400).json({
-    message : 'Provide valid details',
-    statusCode : res.statusCode,
-  })
-}
-
-return res.status(200).json({
-  message : 'Password changed',
-  statusCode : res.statusCode,
-})
-
-}catch(err){
-  return res.status(500).json({
-    message : 'Something went wrong',
-    statusCode : res.statusCode
-  })
-}
-}
 
 module.exports = {
   registerUser,
@@ -224,5 +340,7 @@ module.exports = {
   getProfile,
   updateProfile,
   deleteProfile,
+  forgotPassword,
   changePassword,
+  resetPassword
 };

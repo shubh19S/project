@@ -1,4 +1,0 @@
-
-function generateHash(payload, iteration){
-
-}
