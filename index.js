@@ -1,12 +1,15 @@
 const express = require("express");
+const app = express();
+require('./utils/sendResponse')(app)
+
 const dotenv = require("dotenv");
 const db = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const {authRateLimiter,} = require('./middleware/ratelimiter')
+
 dotenv.config();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-const app = express();
 
 app.use(express.json())
 

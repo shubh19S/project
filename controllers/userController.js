@@ -32,40 +32,26 @@ const registerUser = async (req, res) => {
 
     const token = await tokenService.generateJWT(newUser.id);
 
-    res.status(200).json({
-      message: "created successfully",
-      status: 200,
-      data: newUser,
-      token,
-    });
+    res.status(200).sendResponse("created successfully",{ user : newUser, token }  );
+
   } catch (err) {
     res.status(400).json(err);
   }
 };
 const loginUser = async (req, res) => {
   try {
-    const { userName, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { userName } });
+    const user = await User.findOne({ where: { email } });
 
     if (user && (await hashUtil.compareHash(password, user.password))) {
       const token = await tokenService.generateJWT(user.id);
-
-      res.status(200).json({
-        message: "Login successfully",
-        status: 200,
-        data: user,
-        token,
-      });
+      res.status(200).sendResponse("Login successfully",{ user, token,});
     } else {
-      res.status(401).json({
-        message: "Please enter correct username or password",
-        status: 401,
-        data: null,
-      });
+      res.status(401).sendResponse("Please enter correct email or password",);
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).sendResponse(null,err);
   }
 };
 
@@ -74,23 +60,15 @@ const getProfile = async (req, res) => {
     const id = req.params.id;
 
     if(id!=req.user.id){
-      res.status(401).json({
-        message: "Error",
-        status: 401,
-        data: "Unauthorized",
-      }); 
+      res.status(401).sendResponse("Error", "Unauthorized",); 
     }
   if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
-    res.status(200).json({
-      message: "Success",
-      status: 200,
-      data: user,
-    });
+    res.status(200).sendResponse("Success",{ user },);
   }
  
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).sendResponse(null,err);
   }
 };
 
@@ -98,22 +76,14 @@ const updateProfile = async (req, res) => {
   const { id } = req.params;
 
   if(id!=req.user.id){
-    res.status(401).json({
-      message: "Error",
-      status: 401,
-      data: "Unauthorized",
-    }); 
+    res.status(401).sendResponse("Error","Unauthorized",); 
   }
   if(id==req.user.id){
   const user = await User.findOne({ where: { id } });
 
   if (!user) {
     const result = "User not found";
-    res.status(404).json({
-      message: "Error",
-      status: 404,
-      data: result,
-    });
+    res.status(404).sendResponse("Error",  result,);
   }
   if (user) {
     const { firstName, lastName, phoneNumber, gender } = req.body;
@@ -131,11 +101,7 @@ const updateProfile = async (req, res) => {
         },
       }
     );
-    res.status(200).json({
-      message: "Success",
-      status: 200,
-      data: result,
-    });
+    res.status(200).sendResponse("Success",result,);
     }
   }
 };
@@ -145,36 +111,22 @@ const deleteProfile = async (req, res) => {
     const { id } = req.params;
 
     if(id!=req.user.id){
-      res.status(401).json({
-        message: "Error",
-        status: 401,
-        data: "Unauthorized",
-      }); 
+      res.status(401).sendResponse("Error","Unauthorized",); 
     }
     if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
-    
-
-
+  
     if (!user) {
       const result = "User not found";
-      res.status(404).json({
-        message: "Error",
-        status: 404,
-        data: result,
-      });
+      res.status(404).sendResponse("Error",result,);
     }
     if (user) {
       const result = await User.destroy({ where: { id } });
-      res.status(200).json({
-        message: "Success",
-        status: 200,
-        data: result,
-      });
+      res.status(200).sendResponse("Success",result,);
     }
   }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).sendResponse(null,err);
   }
   
 };
@@ -197,17 +149,14 @@ const deleteProfile = async (req, res) => {
 
 const forgotPassword = async(req,res) => {
   try {
+  
     const { email } = req.body
   const user = await User.findOne({where: {
     email
   }})
 
   if (!user) {
-    res.status(404).json({
-      message: "User not found with this email",
-      status: 404,
-      data: null,
-    });
+    return res.status(404).sendResponse("User not found with this email",);
   }
 
   const userId = user.id
@@ -218,17 +167,9 @@ const forgotPassword = async(req,res) => {
   const userOTP = await OTP.upsert({ id : previousOTP?.id,userId, otp, expireAt: expireTime })
 
   // send response with OTP
-  res.status(200).json({
-    message: "Success",
-    status: 200,
-    data: userOTP,
-  });
+  res.status(200).sendResponse("Success",userOTP,);
   } catch (error) {
-    res.status(400).json({
-      message: "error",
-      status: 400,
-      data: error.message,
-    })
+    res.status(400).sendResponse("error",error.message,)
   }
 }
 
@@ -245,31 +186,19 @@ const resetPassword = async (req, res) => {
   })
 
   if (!user) {
-   return res.status(404).json({ 
-    message: `User not found with this email `,
-    statusCode : this.statusCode
-   })
+   return res.status(404).sendResponse(`User not found with this email `,)
   }
 
   if(!user.otp || !user.otp.otp){
-    return res.status(404).json({ 
-      message: 'Resend OTP',
-      statusCode : res.statusCode
-    })
+    return res.status(404).sendResponse('Resend OTP',)
   }
 
  if( user.otp.expireAt.getTime() < new Date().getTime()){
-  return res.status(404).json({ 
-    message: `Otp has been expired please resend OTP`,
-    statusCode : this.statusCode
-   })
+  return res.status(404).sendResponse(`Otp has been expired please resend OTP`,)
  }
 
  if(otp !== user.otp.otp){
-  return res.status(404).json({ 
-    message: 'Invalid',
-    statusCode : this.statusCode
-   })
+  return res.status(404).sendResponse('Invalid',)
 
  }
 
@@ -280,17 +209,9 @@ const resetPassword = async (req, res) => {
     {where: { id : user.id }}
   )
 
-  res.status(200).json({
-    message: "Password updated successfully",
-    status: 200,
-    data: updatedUser,
-  })
+  res.status(200).sendResponse("Password updated successfully",updatedUser,)
   } catch (error) {
-    res.status(400).json({
-      message: "error",
-      status: 400,
-      data: error.message,
-    })
+    res.status(400).sendResponse("error",error.message,)
   }
 }
 
@@ -304,32 +225,20 @@ try{
   const user = await User.findByPk(userId)
   
   if(!await hashUtil.compareHash(currentPassword,user.password)){
-    return res.status(400).json({
-      message : 'Old password does not matched',
-      statusCode : res.statusCode,
-    })
+    return res.status(400).sendResponse('Old password does not matched',)
   }
   
   const hashedPassword = await hashUtil.generateHash(password)
   const updatedUser =  await user.update( { password : hashedPassword })
   
   if(!updatedUser){
-    return res.status(400).json({
-      message : 'Provide valid details',
-      statusCode : res.statusCode,
-    })
+    return res.status(400).sendResponse('Provide valid details',)
   }
   
-  return res.status(200).json({
-    message : 'Password changed',
-    statusCode : res.statusCode,
-  })
+  return res.status(200).sendResponse('Password changed',)
   
   }catch(err){
-    return res.status(500).json({
-      message : 'Something went wrong',
-      statusCode : res.statusCode
-    })
+    return res.status(500).sendResponse('Something went wrong',)
   }
 }
 
