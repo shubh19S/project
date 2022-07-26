@@ -5,8 +5,12 @@ const auth = require("../middleware/auth");
 const userValidation = require("./../validations/userValidation");
 
 const validate = require("./../middleware/validate");
+const { regsiterAccountSlowDownRateLimiter } = require('../middleware/ratelimiter')
+
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 router
+  .use( regsiterAccountSlowDownRateLimiter( NODE_ENV === 'production') )
   .route("/")
   .post(validate(userValidation.registerUser), userController.registerUser);
 //.get(userController.getUser)

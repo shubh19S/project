@@ -22,10 +22,11 @@ const updateUser = {
 };
 
 const changePassword = {
-  body : Joi.object().keys({
-  currentPassword : Joi.string().required(),
-  password : Joi.string().required()
-  })
+   body : Joi.object().keys({
+    currentPassword : Joi.string().required(),
+    password : Joi.string().required().not(Joi.ref('currentPassword'))
+    .messages({'any.invalid':'Old password and new password cannot be same'})
+   })
 }
 
 const login = {

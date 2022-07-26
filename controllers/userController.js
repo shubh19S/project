@@ -277,38 +277,47 @@ const resetPassword = async (req, res) => {
   }
 }
 
+
+
 const changePassword = async (req,res)=>{
-
+  try{
+  
   const { id : userId } = req.user
-
+  
   const {currentPassword , password } = req.body
-
+  
   const user = await User.findByPk(userId)
-
+  
   if(!await hashUtil.compareHash(currentPassword,user.password)){
-
+  
   return res.status(400).json({
-      statusCode : res.statusCode,
       message : 'Old password does not matched',
+      statusCode : res.statusCode,
     })
   }
-
+  
   const hashedPassword = await hashUtil.generateHash(password)
   const updatedUser =  await user.update( { password : hashedPassword })
-
+  
   if(!updatedUser){
     return res.status(400).json({
-      statusCode : res.statusCode,
       message : 'Provide valid details',
+      statusCode : res.statusCode,
     })
   }
-
+  
   return res.status(200).json({
-      statusCode : res.statusCode,
-      message : 'Password changed',
+    message : 'Password changed',
+    statusCode : res.statusCode,
   })
-}
-
+  
+  }catch(err){
+    return res.status(500).json({
+      message : 'Something went wrong',
+      statusCode : res.statusCode
+    })
+  }
+  }
 
 module.exports = {
   registerUser,
