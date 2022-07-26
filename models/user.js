@@ -12,6 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    toJSON(){
+      const user = this.get()
+      delete user.password
+      return user 
+    }
   }
   User.init({
     userName: {
