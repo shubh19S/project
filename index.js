@@ -3,8 +3,7 @@ const dotenv = require("dotenv");
 const db = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const {authRateLimiter,} = require('./middleware/ratelimiter')
-dotenv.config;
-
+dotenv.config();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const app = express();

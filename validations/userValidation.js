@@ -27,7 +27,7 @@ const changePassword = {
     password : Joi.string().required().not(Joi.ref('currentPassword'))
     .messages({'any.invalid':'Old password and new password cannot be same'})
    })
-}
+  }
 
 const login = {
   body : Joi.object().keys({

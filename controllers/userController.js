@@ -1,7 +1,7 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const { hashUtil, otpGenerator, addMinutes } = require('../utils') 
+const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils'); 
 
 const User = db.user;
 const OTP = db.otp;
@@ -178,6 +178,22 @@ const deleteProfile = async (req, res) => {
   }
   
 };
+// const generateOtp = async (req,res)=>{
+//   try {
+//     const {email } = req.body 
+//   if(!email){
+//     res.status(404).json({
+//       message: "Please enter a valid Email Id",
+//       status: 404,
+//       data: null,
+//     });
+//   }
+//   if(email){
+//   const user = await User.findOne({ where: { email } });
+
+
+
+
 
 const forgotPassword = async(req,res) => {
   try {
@@ -220,7 +236,8 @@ const forgotPassword = async(req,res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { otp, newPassword , email } = req.body
+    
+  const { otp, newPassword , email } = req.body
 
   const user = await User.findOne({
       where : { email } ,
@@ -277,10 +294,8 @@ const resetPassword = async (req, res) => {
   }
 }
 
-
-
-const changePassword = async (req,res)=>{
-  try{
+const changePassword = async (req,res) => {
+try{
   
   const { id : userId } = req.user
   
@@ -289,8 +304,7 @@ const changePassword = async (req,res)=>{
   const user = await User.findByPk(userId)
   
   if(!await hashUtil.compareHash(currentPassword,user.password)){
-  
-  return res.status(400).json({
+    return res.status(400).json({
       message : 'Old password does not matched',
       statusCode : res.statusCode,
     })
@@ -317,7 +331,8 @@ const changePassword = async (req,res)=>{
       statusCode : res.statusCode
     })
   }
-  }
+}
+
 
 module.exports = {
   registerUser,

@@ -3,11 +3,11 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const auth = require("../middleware/auth");
 const userValidation = require("./../validations/userValidation");
-
 const validate = require("./../middleware/validate");
 const { regsiterAccountSlowDownRateLimiter } = require('../middleware/ratelimiter')
-
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const user = require("../models/user");
+
 
 router
   .use( regsiterAccountSlowDownRateLimiter( NODE_ENV === 'production') )
@@ -25,9 +25,9 @@ router
   .patch(auth,validate(userValidation.updateUser) ,userController.updateProfile)
   .delete(auth,userController.deleteProfile);
 
+// router.route('/email/otp').post(userController.generateOtp)
 router
      .route('/change-password')  
      .patch(auth,validate(userValidation.changePassword),userController.changePassword)
-
 
 module.exports = router;
