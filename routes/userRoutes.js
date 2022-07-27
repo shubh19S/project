@@ -27,7 +27,7 @@ router
 
 // router.route('/email/otp').post(userController.generateOtp)
 router
-     .route('/change-password')  
+     .route('/changePassword')  
      .patch(auth,validate(userValidation.changePassword),userController.changePassword)
 
 module.exports = router;

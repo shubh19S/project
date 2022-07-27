@@ -166,7 +166,6 @@ const forgotPassword = async(req,res) => {
   const previousOTP = await OTP.findOne( { userId : userId })
   const userOTP = await OTP.upsert({ id : previousOTP?.id,userId, otp, expireAt: expireTime })
 
-  // send response with OTP
   res.status(200).sendResponse("Success",userOTP,);
   } catch (error) {
     res.status(400).sendResponse("error",error.message,)
@@ -253,3 +252,52 @@ module.exports = {
   changePassword,
   resetPassword
 };
+
+
+
+// const generateOtp = async (req,res)=>{
+  //   try {
+  //     const {email } = req.body 
+  //   if(!email){
+  //     res.status(404).json({
+  //       message: "Please enter a valid Email Id",
+  //       status: 404,
+  //       data: null,
+  //     });
+  //   }
+  //   if(email){
+  //   const user = await User.findOne({ where: { email } });
+  //  if(!user ){
+  //   if(!user ){
+  //     res.status(404).json({
+  //       message: "Please enter a valid Email Id",
+  //       status: 404,
+  //       data: null,
+  //     });
+  //   }
+  //   if(user){
+  
+  //     const otp = otpGenerator.generateOtp()
+  //     const expireAt= addMinutes.currentDate(10)
+  //     const newOtp = await Otp.upsert({id : user?.id,
+  //       userId:user.id,
+  //       otp,
+  //       expireAt
+  
+  //     });
+  
+  //   const mail = await sendEmail.sendMail(email,otp)
+  
+  //   res.status(200).json({
+  //     message: "Success",
+  //     status: 200,
+  //     data: mail.messageId,
+  //   });
+  //     }
+  //   }
+  //   } catch (err) {
+  //     res.status(400).json(err);
+  //   }
+  
+  
+  // }
