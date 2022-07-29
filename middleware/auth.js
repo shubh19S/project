@@ -1,26 +1,26 @@
-const jwt = require("jsonwebtoken");
+const tokenService = require("./../services/tokenService");
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async(req, res, next) => {
   const authHeader = req.headers.authorization;
 
-    if(!authHeader){
-        res.status(403).send({auth: false, message: "Please add token"})
-    }
+  if (!authHeader) {
+    res.status(403).send({ auth: false, message: "Please add token" });
+  }
 
-    const token = authHeader.split(" ")[1]
+  const token = authHeader.split(" ")[1];
 
-  jwt.verify(token, process.env.SECRET_KEY, function (err, decoded) {
-    if (err)
-      return res
-        .status(500)
-        .send({ auth: false, message: "Failed to authenticate token." });
+  try {
+    
+    const decoded = await tokenService.verifyToken(token,);
 
-    req.user ={
-      id :  decoded.sub
-    }
-  
+    req.user = {
+      id: decoded.sub,
+    };
+
     next();
-  });
+  } catch (err) {
+    return res.status(500).sendResponse("Failed to authenticate token.");
+  }
 };
 
 module.exports = verifyToken;

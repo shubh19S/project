@@ -48,12 +48,12 @@ const loginUser = async (req, res) => {
 
     if (user && (await hashUtil.compareHash(password, user.password))) {
       const token = await tokenService.generateJWT(user.id);
-      res.status(200).sendResponse("Login successfully",{ user, token,});
+      res.status(200).sendResponse("Login successfully", { user, token });
     } else {
-      res.status(401).sendResponse("Please enter correct email or password",);
+      res.status(401).sendResponse("Please enter correct email or password");
     }
   } catch (err) {
-    res.status(400).sendResponse(null,err);
+    res.status(400).sendResponse(null, err);
   }
 };
 
@@ -68,7 +68,6 @@ const getProfile = async (req, res) => {
     const user = await User.findOne({ where: { id } });
     res.status(200).sendResponse("Success",{ user },);
   }
- 
   } catch (err) {
     res.status(400).sendResponse(null,err);
   }
@@ -83,8 +82,8 @@ const updateProfile = async (req, res) => {
   if(id==req.user.id){
   const user = await User.findOne({ where: { id } });
 
-  if (!user) {
-    const result = "User not found";
+    if (!user) {
+      const result = "User not found";
     res.status(404).sendResponse("Error",  result,);
   }
   if (user) {
@@ -103,7 +102,7 @@ const updateProfile = async (req, res) => {
         },
       }
     );
-    res.status(200).sendResponse("Success",result,);
+      res.status(200).sendResponse("Success", result);
     }
   }
 };
@@ -112,29 +111,28 @@ const deleteProfile = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if(id!=req.user.id){
-      res.status(401).sendResponse("Error","Unauthorized",); 
+    if (id != req.user.id) {
+      res.status(401).sendResponse("Error", "Unauthorized");
     }
-    if(id==req.user.id){
-    const user = await User.findOne({ where: { id } });
-  
-    if (!user) {
-      const result = "User not found";
-      res.status(404).sendResponse("Error",result,);
+    if (id == req.user.id) {
+      const user = await User.findOne({ where: { id } });
+
+      if (!user) {
+        const result = "User not found";
+        res.status(404).sendResponse("Error", result);
+      }
+      if (user) {
+        const result = await User.destroy({ where: { id } });
+        res.status(200).sendResponse("Success", result);
+      }
     }
-    if (user) {
-      const result = await User.destroy({ where: { id } });
-      res.status(200).sendResponse("Success",result,);
-    }
-  }
   } catch (err) {
-    res.status(400).sendResponse(null,err);
+    res.status(400).sendResponse(null, err);
   }
-  
 };
 // const generateOtp = async (req,res)=>{
 //   try {
-//     const {email } = req.body 
+//     const {email } = req.body
 //   if(!email){
 //     res.status(404).json({
 //       message: "Please enter a valid Email Id",
@@ -172,9 +170,7 @@ const forgotPassword = async(req,res) => {
   } catch (error) {
     res.status(400).sendResponse("error",error.message,)
   }
-}
-
-
+};
 
 const resetPassword = async (req, res) => {
   try {
@@ -205,16 +201,17 @@ const resetPassword = async (req, res) => {
 
   //update password
   const hashedPassword = await hashUtil.generateHash(newPassword)
-  const updatedUser =  await User.update(
+  const updatedUser =  await user.update(
     {password: hashedPassword},
     {where: { id : user.id }}
   )
 
-  res.status(200).sendResponse("Password updated successfully",updatedUser,)
+    user.otp.destroy();
+    res.status(200).sendResponse("Password updated successfully", updatedUser);
   } catch (error) {
-    res.status(400).sendResponse("error",error.message,)
+    res.status(400).sendResponse("error", error.message);
   }
-}
+};
 
 const changePassword = async (req,res) => {
 try{
