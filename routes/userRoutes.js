@@ -29,5 +29,13 @@ router
 router
      .route('/changePassword')  
      .patch(auth,validate(userValidation.changePassword),userController.changePassword)
+const bruteauth = require("../controllers/bruteauth");
+router
+     .route('/block')  
+     .post(bruteauth.isBlocked)     
+     .get(bruteauth.checkBlock)
 
+router
+      .route('/addip')    
+      .post(bruteauth.insertFailedAttempt)
 module.exports = router;

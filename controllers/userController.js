@@ -5,6 +5,8 @@ const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils');
 
 const User = db.user;
 const OTP = db.otp;
+const UserBlockList = db.userBlockList
+
 
 const registerUser = async (req, res) => {
   try {
