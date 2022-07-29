@@ -15,7 +15,7 @@ router
   .post(validate(userValidation.registerUser), userController.registerUser)
 //.get(userController.getUser)
 
-router.route('/login').post(isUserBlocked, validate(userValidation.login), userController.loginUser)
+router.route('/login').post(validate(userValidation.login), isUserBlocked, userController.loginUser)
 router.route('/forgotPassword').post(validate(userValidation.forgotPassword), userController.forgotPassword)
 router.route('/resetPassword').post(validate(userValidation.resetPassword), userController.resetPassword)
 
