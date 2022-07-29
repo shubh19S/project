@@ -6,7 +6,7 @@ const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils');
 const User = db.user;
 const OTP = db.otp;
 const UserBlockList = db.userBlockList
-
+const authService = require('../services/authService')
 
 const registerUser = async (req, res) => {
   try {
@@ -48,12 +48,18 @@ const loginUser = async (req, res) => {
 
     if (user && (await hashUtil.compareHash(password, user.password))) {
       const token = await tokenService.generateJWT(user.id);
-      res.status(200).sendResponse("Login successfully", { user, token });
-    } else {
-      res.status(401).sendResponse("Please enter correct email or password");
-    }
+      return res.status(200).sendResponse("Login successfully", { user, token });
+    } 
+      const result =  await authService(user.id,req.ip)
+   
+      if(!result){
+      return res.status(401).sendResponse("Please enter correct email or password");
+   `` }
+      return res.status(403).sendResponse(result);  
+
+    
   } catch (err) {
-    res.status(400).sendResponse(null, err);
+    res.status(400).sendResponse(err.message);
   }
 };
 
