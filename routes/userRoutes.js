@@ -7,6 +7,7 @@ const validate = require("./../middleware/validate");
 const {registerAccountSlowDownRateLimiter } = require('../middleware/ratelimiter')
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const user = require("../models/user");
+const isUserBlocked = require("./../middleware/isUserBlocked");
 
 
 router
@@ -15,7 +16,7 @@ router
   .post(validate(userValidation.registerUser), userController.registerUser);
 //.get(userController.getUser)
 
-router.route("/login").post(validate(userValidation.login),userController.loginUser);
+router.route("/login").post(isUserBlocked,validate(userValidation.login),userController.loginUser);
 router.route("/forgotPassword").post(validate(userValidation.forgotPassword),userController.forgotPassword);
 router.route("/resetPassword").post(validate(userValidation.resetPassword),userController.resetPassword);
 
