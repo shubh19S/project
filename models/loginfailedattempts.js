@@ -15,15 +15,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   loginFailedAttempts.init({
-    userId:{ 
+    userId:{
       type:DataTypes.INTEGER
-     
+
     },
-    ip: DataTypes.STRING
+    ip: DataTypes.STRING,
+    origin :{
+      type : DataTypes.GEOMETRY('POINT')
+    },
   }, {
     sequelize,
     modelName: 'loginFailedAttempts',
   });
- 
+
   return loginFailedAttempts;
 };

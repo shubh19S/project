@@ -1,7 +1,7 @@
 const db = require("../models/index");
 const bcrypt = require("bcryptjs");
 const tokenService = require("./../services/tokenService");
-const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils'); 
+const {hashUtil,otpGenerator,addMinutes,sendEmail} = require('../utils');
 
 const User = db.user;
 const OTP = db.otp;
@@ -49,15 +49,15 @@ const loginUser = async (req, res) => {
     if (user && (await hashUtil.compareHash(password, user.password))) {
       const token = await tokenService.generateJWT(user.id);
       return res.status(200).sendResponse("Login successfully", { user, token });
-    } 
-      const result =  await authService(user.id,req.ip)
-   
+    }
+      const result =  await authService(user.id,req.ip,)
+
       if(!result){
       return res.status(401).sendResponse("Please enter correct email or password");
-   `` }
-      return res.status(403).sendResponse(result);  
+    }
+      return res.status(403).sendResponse(result);
 
-    
+
   } catch (err) {
     res.status(400).sendResponse(err.message);
   }
@@ -68,7 +68,7 @@ const getProfile = async (req, res) => {
     const id = req.params.id;
 
     if(id!=req.user.id){
-      res.status(401).sendResponse("Error", "Unauthorized",); 
+      res.status(401).sendResponse("Error", "Unauthorized",);
     }
   if(id==req.user.id){
     const user = await User.findOne({ where: { id } });
@@ -83,7 +83,7 @@ const updateProfile = async (req, res) => {
   const { id } = req.params;
 
   if(id!=req.user.id){
-    res.status(401).sendResponse("Error","Unauthorized",); 
+    res.status(401).sendResponse("Error","Unauthorized",);
   }
   if(id==req.user.id){
   const user = await User.findOne({ where: { id } });
@@ -155,7 +155,7 @@ const deleteProfile = async (req, res) => {
 
 const forgotPassword = async(req,res) => {
   try {
-  
+
     const { email } = req.body
   const user = await User.findOne({where: {
     email
@@ -180,12 +180,12 @@ const forgotPassword = async(req,res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    
+
   const { otp, newPassword , email } = req.body
 
   const user = await User.findOne({
       where : { email } ,
-      include: [{ model: OTP, as: "otp" }] 
+      include: [{ model: OTP, as: "otp" }]
   })
 
   if (!user) {
@@ -221,26 +221,26 @@ const resetPassword = async (req, res) => {
 
 const changePassword = async (req,res) => {
 try{
-  
+
   const { id : userId } = req.user
-  
+
   const {currentPassword , password } = req.body
-  
+
   const user = await User.findByPk(userId)
-  
+
   if(!await hashUtil.compareHash(currentPassword,user.password)){
     return res.status(400).sendResponse('Old password does not matched',)
   }
-  
+
   const hashedPassword = await hashUtil.generateHash(password)
   const updatedUser =  await user.update( { password : hashedPassword })
-  
+
   if(!updatedUser){
     return res.status(400).sendResponse('Provide valid details',)
   }
-  
+
   return res.status(200).sendResponse('Password changed',)
-  
+
   }catch(err){
     return res.status(500).sendResponse('Something went wrong',)
   }
@@ -262,7 +262,7 @@ module.exports = {
 
 // const generateOtp = async (req,res)=>{
   //   try {
-  //     const {email } = req.body 
+  //     const {email } = req.body
   //   if(!email){
   //     res.status(404).json({
   //       message: "Please enter a valid Email Id",
@@ -281,18 +281,18 @@ module.exports = {
   //     });
   //   }
   //   if(user){
-  
+
   //     const otp = otpGenerator.generateOtp()
   //     const expireAt= addMinutes.currentDate(10)
   //     const newOtp = await Otp.upsert({id : user?.id,
   //       userId:user.id,
   //       otp,
   //       expireAt
-  
+
   //     });
-  
+
   //   const mail = await sendEmail.sendMail(email,otp)
-  
+
   //   res.status(200).json({
   //     message: "Success",
   //     status: 200,
@@ -303,6 +303,6 @@ module.exports = {
   //   } catch (err) {
   //     res.status(400).json(err);
   //   }
-  
-  
+
+
   // }

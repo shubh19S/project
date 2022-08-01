@@ -12,7 +12,7 @@ const isUserBlocked = async (req, res, next) => {
       },
     })
     const date = new Date()
-    if (date.getTime() < result.blockedTill.getTime()) {
+    if (result && date.getTime() < result.blockedTill.getTime()) {
       return res.status(403).sendResponse(`you can use the service from ${result.blockedTill}`)
     }
     next()

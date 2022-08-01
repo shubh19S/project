@@ -1,6 +1,7 @@
 const Op = require('sequelize').Op
 const db = require('../models/index')
 const { addMinutes } = require('../utils')
+const { ipToLocation } = require('../services/ipService')
 const UserBlockList = db.userBlockList
 const LoginFailedAttempts = db.loginFailedAttempts
 const blockUser = async (userId) => {
@@ -24,7 +25,7 @@ const blockUser = async (userId) => {
     return err
   }
 }
-async function insertFailedAttempt(userId, ip) {
+async function insertFailedAttempt(userId, ip,) {
   try {
     // minutes in 24 hours = 1440
     const time = addMinutes.previousDate(1440)
@@ -62,10 +63,11 @@ async function insertFailedAttempt(userId, ip) {
         return message
       }
     }
-
+    const point = await ipToLocation( ip )
     const result1 = await LoginFailedAttempts.create({
       userId,
       ip,
+      origin : point
     })
     let message = `invalid Username or password`
     return message
